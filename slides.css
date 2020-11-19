@@ -1,0 +1,7 @@
+.reveal section img {
+  border-style: none;
+}
+
+.reveal section.title img {
+  box-shadow: none;
+}
