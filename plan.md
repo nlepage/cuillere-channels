@@ -18,3 +18,5 @@
 
 
 <https://github.com/jevakallio/vscode-hacker-typer>
+
+(vscode://file/home/nico/git/cuillere-channels/test.js)
