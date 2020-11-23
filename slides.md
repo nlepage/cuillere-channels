@@ -14,6 +14,7 @@ css: styles.css
 ![Go channels in JS](title.jpg)
 
 Notes:
+olaaa
 
 ---
 
@@ -31,16 +32,16 @@ Développeur chez Zenika Nantes
 
 ## Asynchronisme
 
-note:
-Concurrence en Go et channels
-Asynchronisme en JS, promesses, async/await, event-loop
-Quels différences ?
+Notes:
+- Concurrence en Go et channels
+- Asynchronisme en JS, promesses, async/await, event-loop
+- Comprendre différences
 
 ---
 
 ## Des channels Go en JS
 
-note:
+Notes:
 Différentes manières d'implémenter
 Implémenter fonctionnalités de base et avancées
 
@@ -52,7 +53,7 @@ Implémenter fonctionnalités de base et avancées
 
 ## Disclaimer
 
-note:
+Notes:
 blabla
 
 ----
@@ -291,6 +292,95 @@ async function deposer(montant) {
 }
 ```
 
+----
+
+![Go channels in JS](title.jpg)
+
+## Inutiles donc indispensables !
+
+----
+
+## Comment ?
+
+Notes:
+- Quelle API ?
+
 ---
 
-## Des channels en JS seraient donc inutiles !
+### async/await et Classes ES6
+
+```js []
+async function example() {
+    const ch = new Chan()
+
+    const v = await ch.recv()
+    await ch.send(123)
+}
+```
+
+---
+
+### async/await et plain objects
+
+```js []
+async function example() {
+    const ch = { /* état du channel */ }
+
+    const v = await recv(ch)
+    await send(ch, 123)
+}
+```
+
+---
+
+<!-- .slide: data-transition="convex-in none" -->
+
+### async/await et références
+
+```js []
+async function example() {
+    const ch = chan()
+
+    const v = await recv(ch)
+    await send(ch, 123)
+}
+```
+
+---
+
+<!-- .slide: data-transition="none convex-out" -->
+
+### async/await et références
+
+```js []
+async function example() {
+    const ch = chan()
+
+    const p = recv(ch)
+    await send(ch, 123)
+}
+```
+
+---
+
+### Fonctions génératrices et références
+
+```js []
+function* example() {
+    const ch = chan()
+
+    const v = yield recv(ch)
+    yield send(ch, 123)
+}
+```
+
+---
+
+## ![Logo CuillereJS](cuillere-logo.png) <!-- .element: style="margin: 0 25px 0; vertical-align: middle; width: 200px;" --> CuillereJS
+
+Framework d'exécution de fonction génératrice.
+
+Un ami 👉 ![Valou](valou.png) <!-- .element: style="maring: 0; vertical-align: middle; width: 400px;" -->
+
+---
+
