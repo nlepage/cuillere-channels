@@ -1,22 +1,25 @@
----
-title: "Go channels in JS"
-theme: "white"
-separator: ----
-verticalSeparator: ---
-enableMenu: false
-enableChalkboard: false
-enableTitleFooter: false
-enableZoom: false
-enableSearch: false
-css: styles.css
----
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Go channels in JS</title>
+    <link rel="shortcut icon" href="./favicon.ico"/>
+    <link rel="stylesheet" href="./dist/reveal.css" />
+    <link rel="stylesheet" href="./dist/theme/white.css" id="theme" />
+    <link rel="stylesheet" href="./css/highlight/zenburn.css" />
+    <link rel="stylesheet" href="./_assets/styles.css" />
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section ><section data-markdown><script type="text/template">
 
 ![Go channels in JS](title.jpg)
 
-Notes:
-olaaa
-
----
+<aside class="notes"><p>olaaa</p>
+</aside></script></section><section data-markdown><script type="text/template">
 
 ![Nico Gopher](z-gopher-g.png) <!-- .element: style="margin: 0; width: 250px;" -->
 
@@ -28,39 +31,35 @@ Développeur chez Zenika Nantes
 
 [![Github logo](github.png) <!-- .element: style="margin: 0 15px 0 0; vertical-align: middle; width: 35px;" --> github.com/nlepage](https://github.com/nlepage)
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## Asynchronisme
 
-Notes:
-- Concurrence en Go et channels
-- Asynchronisme en JS, promesses, async/await, event-loop
-- Comprendre différences
-
----
+<aside class="notes"><ul>
+<li>Concurrence en Go et channels</li>
+<li>Asynchronisme en JS, promesses, async/await, event-loop</li>
+<li>Comprendre différences</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template">
 
 ## Des channels Go en JS
 
-Notes:
-Différentes manières d'implémenter
-Implémenter fonctionnalités de base et avancées
-
----
+<aside class="notes"><p>Différentes manières d&#39;implémenter
+Implémenter fonctionnalités de base et avancées</p>
+</aside></script></section><section data-markdown><script type="text/template">
 
 ## Exemple d'utilisation
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## Disclaimer
 
-Notes:
-blabla
-
-----
+<aside class="notes"><p>blabla</p>
+</aside></script></section></section><section ><section data-markdown><script type="text/template">
 
 ## Concurrence en Go
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```go [|3,6|8-10|4|]
 package main
@@ -75,7 +74,7 @@ func func1() {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```go []
 package main
@@ -99,15 +98,15 @@ func deposer(montant int) {
 ```
 <!-- .element: style="font-size: 0.4em;" -->
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ![Diagramme Concurrence en Go 1](diagram-go-concurrency-1.png)
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ![Diagramme Concurrence en Go 2](diagram-go-concurrency-2.png)
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```go []
 var solde = 100
@@ -137,7 +136,7 @@ func gererSolde(ch) {
 ```
 <!-- .element: style="font-size: 0.33em;" -->
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## Channels
 
@@ -145,11 +144,11 @@ func gererSolde(ch) {
 
 ## Pas de mémoire partagée
 
-----
+</script></section></section><section ><section data-markdown><script type="text/template">
 
 ## Asynchronisme en JS
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 function fetchUrl(url) {
@@ -163,7 +162,7 @@ function fetchUrl(url) {
 fetchUrl('https://mdn.io/Promise')
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 async function fetchUrl(url) {
@@ -175,7 +174,7 @@ async function fetchUrl(url) {
 fetchUrl('https://mdn.io/async/await')
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 let solde = 100
@@ -194,21 +193,21 @@ async function deposer(montant) {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## Un seul Thread
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## Event loop
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cgMADL39EGs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## "Run-to-completion"
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 function parseSource(source) {
@@ -227,7 +226,7 @@ parseUrl('https://mdn.io/Promise')
 parseUrl('https://mdn.io/async/await')
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 async function parseSource(source) {
@@ -246,7 +245,7 @@ parseUrl('https://mdn.io/Promise')
 parseUrl('https://mdn.io/async/await')
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 async function parseSource(source) {
@@ -265,7 +264,7 @@ parseUrl('https://mdn.io/Promise')
 parseUrl('https://mdn.io/async/await')
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## "Run-to-completion"
 
@@ -273,7 +272,7 @@ parseUrl('https://mdn.io/async/await')
 
 ## Partage de mémoire sûr
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ```js []
 let solde = 100
@@ -292,20 +291,20 @@ async function deposer(montant) {
 }
 ```
 
-----
+</script></section></section><section  data-markdown><script type="text/template">
 
 ![Go channels in JS](title.jpg)
 
 ## Inutiles donc indispensables !
 
-----
+</script></section><section ><section data-markdown><script type="text/template">
 
 ## Comment ?
 
-Notes:
-- Quelle API ?
-
----
+<aside class="notes"><ul>
+<li>Quelle API ?</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template">
 
 ### async/await et Classes ES6
 
@@ -318,7 +317,7 @@ async function example() {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ### async/await et plain objects
 
@@ -331,7 +330,7 @@ async function example() {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 <!-- .slide: data-transition="convex-in none" -->
 
@@ -346,7 +345,7 @@ async function example() {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 <!-- .slide: data-transition="none convex-out" -->
 
@@ -361,7 +360,7 @@ async function example() {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ### Fonctions génératrices et références
 
@@ -374,7 +373,7 @@ function* example() {
 }
 ```
 
----
+</script></section><section data-markdown><script type="text/template">
 
 ## ![Logo CuillereJS](cuillere-logo.png) <!-- .element: style="margin: 0 25px 0; vertical-align: middle; width: 200px;" --> CuillereJS
 
@@ -382,5 +381,57 @@ Framework d'exécution de fonction génératrice.
 
 Un ami 👉 [![Valou](valou.png) <!-- .element: style="maring: 0; vertical-align: middle; width: 400px;" -->](https://github.com/EmrysMyrddin)
 
----
+</script></section><section data-markdown><script type="text/template">
 
+</script></section></section></div>
+    </div>
+
+    <script src="./dist/reveal.js"></script>
+
+    <script src="./plugin/markdown/markdown.js"></script>
+    <script src="./plugin/highlight/highlight.js"></script>
+    <script src="./plugin/zoom/zoom.js"></script>
+    <script src="./plugin/notes/notes.js"></script>
+    <script src="./plugin/math/math.js"></script>
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath
+        ]
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {}, queryOptions);
+    </script>
+
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+</html>
