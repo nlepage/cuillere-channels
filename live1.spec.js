@@ -15,7 +15,7 @@ describe('Création, envoi et réception', () => {
         
             yield sleep(100)
         
-            console.log(solde)
+            console.log(`Nouveau solde de ${solde}`)
         }
         
         function* deposer(depots, montant) {
@@ -25,6 +25,7 @@ describe('Création, envoi et réception', () => {
         function* gererSolde(depots) {
             for (let i = 0; i < 2; i++) {
                 const depot = yield recv(depots)
+                console.log(`Dépôt de ${depot}`)
                 solde = solde + depot
             }
         }

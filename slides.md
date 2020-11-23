@@ -385,7 +385,7 @@ Un ami 👉 [![Valou](valou.png) <!-- .element: style="maring: 0; vertical-align
 ---
 
 ```js []
-const cuillere = require('cuillere')
+const cuillere = require('@cuillere/core')
 
 function* helloWorld() {
     const name = yield getName()
@@ -430,3 +430,7 @@ function* gererSolde(depots) {
 }
 ```
 <!-- .element: style="font-size: 0.32em;" -->
+
+---
+
+[![Live coding n°1](slide_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live1.spec.js)
