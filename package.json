@@ -1,0 +1,16 @@
+{
+  "name": "cuillere-channels",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Unlicense",
+  "scripts": {
+    "build": "reveal-md slides.md --static ./docs/",
+    "start": "reveal-md slides.md -w",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@cuillere/core": "^0.12.0-alpha.4",
+    "jest": "^26.6.3",
+    "reveal-md": "^4.1.7"
+  }
+}

@@ -113,25 +113,25 @@ func deposer(montant int) {
 var solde = 100
 
 func main() {
-    var ch = make(chan int)
+    var depots = make(chan int)
 
-    go deposer(ch, 100)
-    go deposer(ch, 200)
+    go deposer(depots, 100)
+    go deposer(depots, 200)
 
-    go gererSolde(ch)
+    go gererSolde(depots)
 
     time.Sleep(100)
 
     println(solde)
 }
 
-func deposer(ch chan int, montant int) {
-    ch <- montant
+func deposer(depots chan int, montant int) {
+    depots <- montant
 }
 
-func gererSolde(ch) {
-    for {
-        solde = solde + <-ch
+func gererSolde(depots) {
+    for i:= 0; i < 2; i++ {
+        solde = solde + <-depots
     }
 }
 ```
@@ -384,3 +384,49 @@ Un ami 👉 [![Valou](valou.png) <!-- .element: style="maring: 0; vertical-align
 
 ---
 
+```js []
+const cuillere = require('cuillere')
+
+function* helloWorld() {
+    const name = yield getName()
+
+    console.log(`Hello ${name}!`) // "Hello world!"
+}
+
+function* getName() {
+    return 'world'
+}
+
+cuillere().start(example())
+```
+
+---
+
+```js []
+let solde = 100
+ 
+function* main() {
+    const depots = chan()
+ 
+    yield fork(deposer(depots, 100))
+    yield fork(deposer(depots, 200))
+ 
+    yield fork(gererSolde(depots))
+ 
+    yield sleep(100)
+ 
+    console.log(solde)
+}
+ 
+function* deposer(depots, montant) {
+    yield send(depots, montant)
+}
+ 
+function* gererSolde(depots) {
+    for (let i = 0; i < 2; i++) {
+        const depot = yield recv(depots)
+        solde = solde + depot
+    }
+}
+```
+<!-- .element: style="font-size: 0.32em;" -->
