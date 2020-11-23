@@ -7,7 +7,6 @@ describe('Live 1', () => {
  
         function* main() {
             const depots = chan()
-            console.log(depots)
         
             yield fork(deposer(depots, 100))
             yield fork(deposer(depots, 200))

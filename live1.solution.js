@@ -23,9 +23,7 @@ function channelsPlugin() {
                 const ch = chans.get(key)
 
                 const sender = ch.sendQ.shift()
-                if (sender) {
-                    return sender()
-                }
+                if (sender) return sender()
 
                 return new Promise(resolve => {
                     ch.recvQ.push(resolve)

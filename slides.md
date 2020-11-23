@@ -423,4 +423,12 @@ function* deposer(depots, montant) {
 
 ---
 
+```js []
+const cllr = cuillere(channelsPlugin())
+
+cllr.start(main())
+```
+
+---
+
 [![Live coding n°1](slide_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live1.spec.js)
