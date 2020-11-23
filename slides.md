@@ -118,21 +118,16 @@ func main() {
     go deposer(depots, 100)
     go deposer(depots, 200)
 
-    go gererSolde(depots)
-
-    time.Sleep(100)
+    for i:= 0; i < 2; i++ {
+        var depot = <-depots
+        solde = solde + depot
+    }
 
     println(solde)
 }
 
 func deposer(depots chan int, montant int) {
     depots <- montant
-}
-
-func gererSolde(depots) {
-    for i:= 0; i < 2; i++ {
-        solde = solde + <-depots
-    }
 }
 ```
 <!-- .element: style="font-size: 0.33em;" -->
@@ -411,25 +406,20 @@ function* main() {
     yield fork(deposer(depots, 100))
     yield fork(deposer(depots, 200))
  
-    yield fork(gererSolde(depots))
- 
-    yield sleep(100)
- 
-    console.log(solde)
-}
- 
-function* deposer(depots, montant) {
-    yield send(depots, montant)
-}
- 
-function* gererSolde(depots) {
     for (let i = 0; i < 2; i++) {
         const depot = yield recv(depots)
         solde = solde + depot
     }
+ 
+    console.log(`Nouveau solde de ${solde}`)
+}
+ 
+function* deposer(depots, montant) {
+    yield send(depots, montant)
+    console.log(`Dépôt de ${montant} terminé`)
 }
 ```
-<!-- .element: style="font-size: 0.32em;" -->
+<!-- .element: style="font-size: 0.4em;" -->
 
 ---
 
