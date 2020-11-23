@@ -80,7 +80,10 @@ func func1() {
 ```go []
 package main
 
-import "time"
+import (
+    "fmt"
+    "time"
+)
 
 var solde = 100
 
@@ -88,16 +91,16 @@ func main() {
     go deposer(100)
     go deposer(200)
 
-    time.Sleep(100)
+    time.Sleep(100*time.Millisecond)
 
-    println(solde)
+    fmt.Println("Nouveau solde de", solde)
 }
 
 func deposer(montant int) {
     solde = solde + montant
 }
 ```
-<!-- .element: style="font-size: 0.4em;" -->
+<!-- .element: style="font-size: 0.38em;" -->
 
 ---
 
@@ -123,7 +126,7 @@ func main() {
         solde = solde + depot
     }
 
-    println(solde)
+    fmt.Println("Nouveau solde de", solde)
 }
 
 func deposer(depots chan int, montant int) {
@@ -131,6 +134,8 @@ func deposer(depots chan int, montant int) {
 }
 ```
 <!-- .element: style="font-size: 0.33em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/3ixH9HCi7lH) <!-- .element: target="_blank" -->
 
 ---
 
@@ -409,6 +414,7 @@ function* main() {
     for (let i = 0; i < 2; i++) {
         const depot = yield recv(depots)
         solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
     }
  
     console.log(`Nouveau solde de ${solde}`)
@@ -419,7 +425,7 @@ function* deposer(depots, montant) {
     console.log(`Dépôt de ${montant} terminé`)
 }
 ```
-<!-- .element: style="font-size: 0.4em;" -->
+<!-- .element: style="font-size: 0.38em;" -->
 
 ---
 
@@ -432,3 +438,73 @@ cllr.start(main())
 ---
 
 [![Live coding n°1](slide_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live1.spec.js)
+
+----
+
+## C'est tout ?
+
+---
+
+- Channel avec buffer
+- Fermeture de channel
+- Itération sur channel
+- Select
+
+----
+
+## Channel avec buffer
+
+---
+
+```go []
+var solde = 100
+
+func main() {
+    var depots = make(chan int, 5)
+
+    var montants = []int{100, 200, 500, 1000, 600, 400, 300, 700, 900, 800}
+    for _, montant := range montants {
+        go deposer(depots, montant)
+    }
+
+    for range montants {
+        var depot = <-depots
+        solde = solde + depot
+    }
+
+    fmt.Printf("Nouveau solde de %d\n", solde)
+}
+
+func deposer(depots chan int, montant int) {
+    depots <- montant
+}
+```
+<!-- .element: style="font-size: 0.38em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/qx6X_cXAiBq) <!-- .element: target="_blank" -->
+
+---
+
+```js []
+let solde = 100
+ 
+function* main() {
+    const depots = chan()
+ 
+    let montants = [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]
+    for (const montant of montants) yield fork(deposer(depots, montant))
+    
+    for (let i = 0; i < montants.length; i++) {
+        const depot = yield recv(depots)
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+ 
+    console.log(`Nouveau solde de ${solde}`)
+}
+ 
+function* deposer(depots, montant) {
+    yield send(depots, montant)
+    console.log(`Dépôt de ${montant} terminé`)
+}
+```

@@ -14,6 +14,7 @@ describe('Live 1', () => {
             for (let i = 0; i < 2; i++) {
                 const depot = yield recv(depots)
                 solde = solde + depot
+                console.log(`Dépôt de ${depot} reçu`)
             }
         
             console.log(`Nouveau solde de ${solde}`)
