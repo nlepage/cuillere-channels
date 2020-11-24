@@ -585,4 +585,25 @@ function* deposer(depots, montants) {
 
 ---
 
-[![Live coding n°3](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live3.spec.js)
+## Les règles
+
+- On peut encore recevoir
+- On ne peut plus envoyer
+- On ne peut fermer qu'une seule fois
+
+---
+
+[![Live coding n°3](scooter_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live3.spec.js)
+
+Notes:
+
+- chan: ajout closed
+- close: implem sans drain (FIXME)
+- detail:
+  - recv factory
+  - recv handler (x3)
+  - send handler (appel recver)
+- closed:
+  - send handler
+  - recv handler (avant Promise)
+- close: drain recvQ

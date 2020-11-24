@@ -5,9 +5,11 @@ function channelsPlugin() {
             async* send({ key, value }) {
                 const ch = chans.get(key)
 
+                if (ch.closed) throw new Error('channel is closed')
+
                 const rcver = ch.recvQ.shift()
                 if (rcver) {
-                    rcver(value)
+                    rcver([value, true])
                     return
                 }
 
@@ -25,7 +27,7 @@ function channelsPlugin() {
                 })
             },
 
-            async* recv({ key }) {
+            async* recv({ key, detail }) {
                 const ch = chans.get(key)
 
                 if (ch.bufferLength !== 0) {
@@ -36,14 +38,16 @@ function channelsPlugin() {
                     if (sender) ch.buffer[ch.bufferLength - 1] = sender()
                     else ch.bufferLength--
 
-                    return value
+                    return detail ? [value, true] : value
                 }
 
                 const sender = ch.sendQ.shift()
-                if (sender) return sender()
+                if (sender) return detail ? [sender(), true] : sender()
+
+                if (ch.closed) return detail ? [undefined, false] : undefined
 
                 return new Promise(resolve => {
-                    ch.recvQ.push(resolve)
+                    ch.recvQ.push(detail ? resolve : ([value]) => resolve(value))
                 })
             },
         }
@@ -61,6 +65,7 @@ function chan(capacity = 0) {
         recvQ: [],
         buffer: Array(capacity),
         bufferLength: 0,
+        closed: false,
     })
     return key
 }
@@ -73,15 +78,23 @@ function send(key, value) {
     }
 }
 
-function recv(key) {
+function recv(key, detail = false) {
     return {
         kind: '@channels/recv',
         key,
+        detail,
     }
 }
 
 function close(key) {
-    // FIXME
+    const ch = chans.get(key)
+
+    if (ch.closed) throw new Error('channel already closed')
+
+    ch.closed = true
+
+    let recver
+    while (recver = ch.recvQ.shift()) recver([undefined, false])
 }
 
 module.exports = {

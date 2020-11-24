@@ -31,6 +31,6 @@ describe('Live 1', () => {
 
         await cllr.start(main())
 
-        expect(solde).toBe(400)
+        expect(solde).toBe(5600)
     })
 })
