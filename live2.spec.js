@@ -1,5 +1,5 @@
 const { cuillere, fork } = require('@cuillere/core')
-const { channelsPlugin, chan, send, recv } = require('./live2')
+const { channelsPlugin, chan, send, recv } = require('./live')
 
 describe('Live 2', () => {
     it('On doit pouvoir créer un channel avec buffer, et envoyer et recevoir dessus', async () => {
