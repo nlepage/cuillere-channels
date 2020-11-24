@@ -502,7 +502,7 @@ function* main() {
  
     console.log(`Nouveau solde de ${solde}`)
 }
- 
+
 function* deposer(depots, montant) {
     yield send(depots, montant)
     console.log(`Dépôt de ${montant} terminé`)
@@ -512,4 +512,77 @@ function* deposer(depots, montant) {
 
 ---
 
+## TODO schémas
+
+---
+
 [![Live coding n°2](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live2.spec.js)
+
+----
+
+## Fermeture de channels
+
+---
+
+```go []
+var solde = 100
+
+func main() {
+    var depots = make(chan int, 5)
+
+    go deposer(depots, []int{100, 200, 500, 1000, 600, 400, 300, 700, 900, 800})
+
+    for {
+        var depot, ok = <-depots
+        if !ok {
+            break
+        }
+        solde = solde + depot
+    }
+
+    fmt.Printf("Nouveau solde de %d\n", solde)
+}
+
+func deposer(depots chan int, montants []int) {
+    for _, montant := range montants {
+        depots <- montant
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.33em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/ksLbut42NCb) <!-- .element: target="_blank" -->
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const depots = chan(5)
+
+    yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
+
+    while (true) {
+        const [depot, ok] = yield recv(depots, true)
+        if (!ok) break
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montants) {
+    for (const montant of montants) {
+        yield send(depots, montant)
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.34em;" -->
+
+---
+
+[![Live coding n°3](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live3.spec.js)
