@@ -489,7 +489,7 @@ func deposer(depots chan int, montant int) {
 let solde = 100
  
 function* main() {
-    const depots = chan()
+    const depots = chan(5)
  
     let montants = [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]
     for (const montant of montants) yield fork(deposer(depots, montant))
@@ -508,3 +508,8 @@ function* deposer(depots, montant) {
     console.log(`Dépôt de ${montant} terminé`)
 }
 ```
+<!-- .element: style="font-size: 0.38em;" -->
+
+---
+
+[![Live coding n°2](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live2.spec.js)
