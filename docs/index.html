@@ -79,7 +79,10 @@ func func1() {
 ```go []
 package main
 
-import "time"
+import (
+    "fmt"
+    "time"
+)
 
 var solde = 100
 
@@ -87,16 +90,16 @@ func main() {
     go deposer(100)
     go deposer(200)
 
-    time.Sleep(100)
+    time.Sleep(100*time.Millisecond)
 
-    println(solde)
+    fmt.Println("Nouveau solde de", solde)
 }
 
 func deposer(montant int) {
     solde = solde + montant
 }
 ```
-<!-- .element: style="font-size: 0.4em;" -->
+<!-- .element: style="font-size: 0.38em;" -->
 
 </script></section><section data-markdown><script type="text/template">
 
@@ -112,29 +115,26 @@ func deposer(montant int) {
 var solde = 100
 
 func main() {
-    var ch = make(chan int)
+    var depots = make(chan int)
 
-    go deposer(ch, 100)
-    go deposer(ch, 200)
+    go deposer(depots, 100)
+    go deposer(depots, 200)
 
-    go gererSolde(ch)
-
-    time.Sleep(100)
-
-    println(solde)
-}
-
-func deposer(ch chan int, montant int) {
-    ch <- montant
-}
-
-func gererSolde(ch) {
-    for {
-        solde = solde + <-ch
+    for i:= 0; i < 2; i++ {
+        var depot = <-depots
+        solde = solde + depot
     }
+
+    fmt.Println("Nouveau solde de", solde)
+}
+
+func deposer(depots chan int, montant int) {
+    depots <- montant
 }
 ```
 <!-- .element: style="font-size: 0.33em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/3ixH9HCi7lH) <!-- .element: target="_blank" -->
 
 </script></section><section data-markdown><script type="text/template">
 
@@ -153,9 +153,9 @@ func gererSolde(ch) {
 ```js []
 function fetchUrl(url) {
     fetch(url).then((response) => {
-        response.text().then((source) => {
-            console.log(source)
-        })
+        return response.text()
+    }).then((source) => {
+        console.log(source)
     })
 }
 
@@ -229,7 +229,7 @@ parseUrl('https://mdn.io/async/await')
 </script></section><section data-markdown><script type="text/template">
 
 ```js []
-async function parseSource(source) {
+function parseSource(source) {
     // ...
     const config = loadParserConfig()
     // ...
@@ -257,7 +257,7 @@ async function parseSource(source) {
 async function parseUrl(url) {
     const response = await fetch('https://mdn.io/Promise')
     const source = await response.text()
-    parseSource(source)
+    await parseSource(source)
 }
 
 parseUrl('https://mdn.io/Promise')
@@ -383,7 +383,619 @@ Un ami 👉 [![Valou](valou.png) <!-- .element: style="maring: 0; vertical-align
 
 </script></section><section data-markdown><script type="text/template">
 
-</script></section></section></div>
+```js []
+const cuillere = require('@cuillere/core')
+
+function* helloWorld() {
+    const name = yield getName()
+
+    console.log(`Hello ${name}!`) // "Hello world!"
+}
+
+function* getName() {
+    return 'world'
+}
+
+cuillere().start(helloWorld())
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+let solde = 100
+ 
+function* main() {
+    const depots = chan()
+ 
+    yield fork(deposer(depots, 100))
+    yield fork(deposer(depots, 200))
+ 
+    for (let i = 0; i < 2; i++) {
+        const depot = yield recv(depots)
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+ 
+    console.log(`Nouveau solde de ${solde}`)
+}
+ 
+function* deposer(depots, montant) {
+    yield send(depots, montant)
+    console.log(`Dépôt de ${montant} terminé`)
+}
+```
+<!-- .element: style="font-size: 0.38em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+const cllr = cuillere(channelsPlugin())
+
+cllr.start(main())
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+[![Live coding n°1](slide_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live1.spec.js)
+
+</script></section></section><section ><section data-markdown><script type="text/template">
+
+## C'est tout ?
+
+</script></section><section data-markdown><script type="text/template">
+
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☐ Channel avec buffer
+### ☐ Fermeture de channel
+### ☐ Itération sur channel
+### ☐ Select
+
+</script></section><section data-markdown><script type="text/template">
+
+## Channel avec buffer
+
+</script></section><section data-markdown><script type="text/template">
+
+## TODO schéma
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+var solde = 100
+
+func main() {
+    var depots = make(chan int, 5)
+
+    var montants = []int{100, 200, 500, 1000, 600, 400, 300, 700, 900, 800}
+    for _, montant := range montants {
+        go deposer(depots, montant)
+    }
+
+    for range montants {
+        var depot = <-depots
+        solde = solde + depot
+    }
+
+    fmt.Printf("Nouveau solde de %d\n", solde)
+}
+
+func deposer(depots chan int, montant int) {
+    depots <- montant
+}
+```
+<!-- .element: style="font-size: 0.38em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/qx6X_cXAiBq) <!-- .element: target="_blank" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+let solde = 100
+ 
+function* main() {
+    const depots = chan(5)
+ 
+    let montants = [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]
+    for (const montant of montants) yield fork(deposer(depots, montant))
+    
+    for (let i = 0; i < montants.length; i++) {
+        const depot = yield recv(depots)
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+ 
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montant) {
+    yield send(depots, montant)
+    console.log(`Dépôt de ${montant} terminé`)
+}
+```
+<!-- .element: style="font-size: 0.38em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+[![Live coding n°2](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live2.spec.js)
+
+</script></section></section><section ><section data-markdown><script type="text/template">
+
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☐ Fermeture de channel
+### ☐ Itération sur channel
+### ☐ Select
+
+</script></section><section data-markdown><script type="text/template">
+
+## Fermeture de channel
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+var solde = 100
+
+func main() {
+    var depots = make(chan int, 5)
+
+    go deposer(depots, []int{100, 200, 500, 1000, 600, 400, 300, 700, 900, 800})
+
+    for {
+        var depot, ok = <-depots
+        if !ok {
+            break
+        }
+        solde = solde + depot
+    }
+
+    fmt.Printf("Nouveau solde de %d\n", solde)
+}
+
+func deposer(depots chan int, montants []int) {
+    for _, montant := range montants {
+        depots <- montant
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.33em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/ksLbut42NCb) <!-- .element: target="_blank" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+let solde = 100
+
+function* main() {
+    const depots = chan(5)
+
+    yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
+
+    while (true) {
+        const [depot, ok] = yield recv(depots, true)
+        if (!ok) break
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montants) {
+    for (const montant of montants) {
+        yield send(depots, montant)
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.34em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+## Les règles
+
+- On peut encore recevoir
+- On ne peut plus envoyer
+- On ne peut fermer qu'une seule fois
+
+</script></section><section data-markdown><script type="text/template">
+
+[![Live coding n°3](scooter_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live3.spec.js)
+
+<aside class="notes"><ul>
+<li>chan: ajout closed</li>
+<li>close: implem sans drain (FIXME)</li>
+<li>detail:<ul>
+<li>recv factory</li>
+<li>recv handler (x3)</li>
+<li>send handler (appel recver)</li>
+</ul>
+</li>
+<li>closed:<ul>
+<li>send handler</li>
+<li>recv handler (avant Promise)</li>
+</ul>
+</li>
+<li>close: drain recvQ</li>
+</ul>
+</aside></script></section></section><section ><section data-markdown><script type="text/template">
+
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☑ Fermeture de channel
+### ☐ Itération sur channel
+### ☐ Select
+
+</script></section><section data-markdown><script type="text/template">
+
+## Itération sur channel
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+var solde = 100
+
+func main() {
+    var depots = make(chan int, 5)
+
+    go deposer(depots, []int{100, 200, 500, 1000, 600, 400, 300, 700, 900, 800})
+
+    for depot := range depots {
+        solde = solde + depot
+    }
+
+    fmt.Printf("Nouveau solde de %d\n", solde)
+}
+
+func deposer(depots chan int, montants []int) {
+    for _, montant := range montants {
+        depots <- montant
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.4em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/xBXZ2b_vwMA) <!-- .element: target="_blank" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+let solde = 100
+
+function* main() {
+    const depots = chan(5)
+
+    yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
+
+    for (let [depot, ok] = yield recv(depots, true); ok; [depot, ok] = yield recv(depots, true)) {
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montants) {
+    for (const montant of montants) {
+        yield send(depots, montant)
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.36em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+### `for...of`
+
+```js []
+for (const valeur of itérable) {
+    console.log(valeur)
+}
+```
+
+<aside class="notes"><ul>
+<li>Expliquer itérable</li>
+</ul>
+</aside></script></section><section data-markdown><script type="text/template">
+
+### ES2018 : `for await...of`
+
+```js []
+for await (const valeur of iterableAsynchrone) {
+    console.log(valeur)
+}
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+let solde = 100
+
+function* main() {
+    const depots = chan(5)
+
+    yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
+
+    for await (const depot of range(depots)) {
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montants) {
+    for (const montant of montants) {
+        yield send(depots, montant)
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.38em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+[![Live coding n°4](swing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live4.spec.js)
+
+</script></section></section><section ><section data-markdown><script type="text/template">
+
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☑ Fermeture de channel
+### ☑ Itération sur channel
+### ☐ Select
+
+</script></section><section data-markdown><script type="text/template">
+
+## Select
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+func main() {
+    var ch1 = make(chan int)
+    var ch2 = make(chan string)
+
+    select {
+    case ch1 <- 123:
+        fmt.Println("Entier envoyé !")
+    case ch2 <- "foo":
+        fmt.Println("Chaîne envoyée !")
+    }
+}
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+func main() {
+    var ch1 = make(chan int)
+    var ch2 = make(chan string)
+
+    select {
+    case value := <-ch1:
+        fmt.Printf("Entier %d reçu\n", value)
+    case value := <-ch2:
+        fmt.Printf("Chaîne \"%s\" reçue\n", value)
+    }
+}
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+func main() {
+    var ch = make(chan int)
+
+    select {
+    case ch <- 123:
+        fmt.Println("Entier envoyé !")
+    default:
+        fmt.Println("Envoi impossible !")
+    }
+}
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+```go []
+func main() {
+    var ch = make(chan int)
+
+    select {
+    case ch <- 123:
+        fmt.Println("Entier envoyé !")
+    case <-time.After(10 * time.Second):
+        fmt.Println("Timeout !")
+    }
+}
+```
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    const [i, value] = yield select(
+        recv(ch1),
+        recv(ch2),
+    )
+
+    switch (i) {
+    case 0:
+        console.log(`Entier ${value} reçu`)
+        break
+    case 1:
+        console.log(`Chaîne "${value}" reçue`)
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.42em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    const [i] = yield select(
+        send(ch1, 123),
+        send(ch2, 'foo'),
+    )
+
+    switch (i) {
+    case 0:
+        console.log('Entier envoyé !')
+        break
+    case 1:
+        console.log('Chaîne envoyée !')
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.42em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    const [i] = yield select(
+        send(ch1, 123),
+        select.default,
+    )
+
+    switch (i) {
+    case 0:
+        console.log('Entier envoyé !')
+        break
+    default:
+        console.log('Envoi impossible !')
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.42em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    yield select(
+        [recv(ch1), (value) => {
+            console.log(`Entier ${value} reçu`)
+        }],
+        [recv(ch2), (value) => {
+            console.log(`Chaîne "${value}" reçue`)
+        }],
+    )
+}
+```
+<!-- .element: style="font-size: 0.54em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+```js []
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    yield select(
+        [recv(ch1), function*(value) {
+            yield send(ch2, `${value}`)
+        }],
+        [recv(ch2), (value) => {
+            console.log(`Chaîne "${value}" reçue`)
+        }],
+    )
+}
+```
+<!-- .element: style="font-size: 0.52em;" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+[![No demo !](asleep_2.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere/channels/src/index.ts:48)
+
+</script></section><section data-markdown><script type="text/template">
+
+## Une ou des opérations sont-elles prêtes ?
+
+</script></section><section data-markdown><script type="text/template">
+
+## Une opération est prête
+## 👇
+## Elle est déclenchée
+
+</script></section><section data-markdown><script type="text/template">
+
+## Plusieurs opération sont prêtes
+## 👇
+## Une opération au hasard est déclenchée
+
+</script></section><section data-markdown><script type="text/template">
+
+## Aucune opération n'est prête
+## 👇
+## Est-ce qu'il y a un default ?
+
+</script></section><section data-markdown><script type="text/template">
+
+## Il y a un default
+## 👇
+## Il est déclenché
+
+</script></section><section data-markdown><script type="text/template">
+
+## Il n'y a pas de default
+## 👇
+## On attend que l'une des opérations soit prête
+
+</script></section></section><section ><section data-markdown><script type="text/template">
+
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☑ Fermeture de channel
+### ☑ Itération sur channel
+### ☑ Select
+
+</script></section><section data-markdown><script type="text/template">
+
+## Exemple d'utilisation
+
+</script></section><section data-markdown><script type="text/template">
+
+[![Logo envelope](envelope_logo.gif)](https://github.com/tgirier/envelope) <!-- .element: target="_blank" -->
+
+</script></section><section data-markdown><script type="text/template">
+
+## [@cuillere/envelope 🥄📨](vscode://file/home/nico/git/envelope/src/index.ts) <!-- .element: target="_blank" -->
+
+</script></section></section><section  data-markdown><script type="text/template">
+
+![Merci !](heart_gopher.png) <!-- .element: style="width: 200px;" -->
+</script></section></div>
     </div>
 
     <script src="./dist/reveal.js"></script>
