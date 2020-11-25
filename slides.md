@@ -445,14 +445,21 @@ cllr.start(main())
 
 ---
 
-- Channel avec buffer
-- Fermeture de channel
-- Itération sur channel
-- Select
+ <!-- .slide: style="padding-left: 200px; text-align: left;" -->
 
-----
+### ☑ Envoi et réception
+### ☐ Channel avec buffer
+### ☐ Fermeture de channel
+### ☐ Itération sur channel
+### ☐ Select
+
+---
 
 ## Channel avec buffer
+
+---
+
+## TODO schéma
 
 ---
 
@@ -512,15 +519,21 @@ function* deposer(depots, montant) {
 
 ---
 
-## TODO schémas
-
----
-
 [![Live coding n°2](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live2.spec.js)
 
 ----
 
-## Fermeture de channels
+ <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☐ Fermeture de channel
+### ☐ Itération sur channel
+### ☐ Select
+
+---
+
+## Fermeture de channel
 
 ---
 
@@ -607,3 +620,203 @@ Notes:
   - send handler
   - recv handler (avant Promise)
 - close: drain recvQ
+
+----
+
+ <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☑ Fermeture de channel
+### ☐ Itération sur channel
+### ☐ Select
+
+---
+
+## Itération sur channel
+
+---
+
+```go []
+var solde = 100
+
+func main() {
+    var depots = make(chan int, 5)
+
+    go deposer(depots, []int{100, 200, 500, 1000, 600, 400, 300, 700, 900, 800})
+
+    for depot := range depots {
+        solde = solde + depot
+    }
+
+    fmt.Printf("Nouveau solde de %d\n", solde)
+}
+
+func deposer(depots chan int, montants []int) {
+    for _, montant := range montants {
+        depots <- montant
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.4em;" -->
+
+[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/xBXZ2b_vwMA) <!-- .element: target="_blank" -->
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const depots = chan(5)
+
+    yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
+
+    for (let [depot, ok] = yield recv(depots, true); ok; [depot, ok] = yield recv(depots, true)) {
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montants) {
+    for (const montant of montants) {
+        yield send(depots, montant)
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.36em;" -->
+
+---
+
+### `for...of`
+
+```js []
+for (const valeur of itérable) {
+    console.log(valeur)
+}
+```
+
+Notes:
+
+- Expliquer itérable
+
+---
+
+### ES2018 : `for await...of`
+
+```js []
+for await (const valeur of iterableAsynchrone) {
+    console.log(valeur)
+}
+```
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const depots = chan(5)
+
+    yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
+
+    for await (const depot of range(depots)) {
+        solde = solde + depot
+        console.log(`Dépôt de ${depot} reçu`)
+    }
+
+    console.log(`Nouveau solde de ${solde}`)
+}
+
+function* deposer(depots, montants) {
+    for (const montant of montants) {
+        yield send(depots, montant)
+    }
+    close(depots)
+}
+```
+<!-- .element: style="font-size: 0.38em;" -->
+
+---
+
+[![Live coding n°4](swing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live4.spec.js)
+
+----
+
+ <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☑ Fermeture de channel
+### ☑ Itération sur channel
+### ☐ Select
+
+---
+
+## Select
+
+---
+
+```go
+func main() {
+    var ch1 = make(chan int)
+    var ch2 = make(chan string)
+
+    select {
+    case ch1 <- 123:
+        fmt.Println("123 envoyé !")
+    case ch2 <- "foo":
+        fmt.Println("foo envoyé !")
+    }
+}
+```
+
+---
+
+```go
+func main() {
+    var ch1 = make(chan int)
+    var ch2 = make(chan string)
+
+    select {
+    case value := <-ch1:
+        fmt.Println(value)
+    case value := <-ch2:
+        fmt.Println(value)
+    }
+}
+```
+
+---
+
+```go
+func main() {
+    var ch = make(chan int)
+
+    select {
+    case ch <- 123:
+        fmt.Println("123 envoyé !")
+    default:
+        fmt.Println("Envoi impossible !")
+    }
+}
+```
+
+---
+
+```go
+func main() {
+    var ch = make(chan int)
+
+    select {
+    case ch <- 123:
+        fmt.Println("123 envoyé !")
+    case <-time.After(10*time.Second):
+        fmt.Println("Timeout !")
+    }
+}
+```
