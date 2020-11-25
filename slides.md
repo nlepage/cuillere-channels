@@ -445,7 +445,7 @@ cllr.start(main())
 
 ---
 
- <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
 
 ### ☑ Envoi et réception
 ### ☐ Channel avec buffer
@@ -523,7 +523,7 @@ function* deposer(depots, montant) {
 
 ----
 
- <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
 
 ### ☑ Envoi et réception
 ### ☑ Channel avec buffer
@@ -623,7 +623,7 @@ Notes:
 
 ----
 
- <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
 
 ### ☑ Envoi et réception
 ### ☑ Channel avec buffer
@@ -747,7 +747,7 @@ function* deposer(depots, montants) {
 
 ----
 
- <!-- .slide: style="padding-left: 200px; text-align: left;" -->
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
 
 ### ☑ Envoi et réception
 ### ☑ Channel avec buffer
@@ -761,45 +761,45 @@ function* deposer(depots, montants) {
 
 ---
 
-```go
+```go []
 func main() {
     var ch1 = make(chan int)
     var ch2 = make(chan string)
 
     select {
     case ch1 <- 123:
-        fmt.Println("123 envoyé !")
+        fmt.Println("Entier envoyé !")
     case ch2 <- "foo":
-        fmt.Println("foo envoyé !")
+        fmt.Println("Chaîne envoyée !")
     }
 }
 ```
 
 ---
 
-```go
+```go []
 func main() {
     var ch1 = make(chan int)
     var ch2 = make(chan string)
 
     select {
     case value := <-ch1:
-        fmt.Println(value)
+        fmt.Printf("Entier %d reçu\n", value)
     case value := <-ch2:
-        fmt.Println(value)
+        fmt.Printf("Chaîne \"%s\" reçue\n", value)
     }
 }
 ```
 
 ---
 
-```go
+```go []
 func main() {
     var ch = make(chan int)
 
     select {
     case ch <- 123:
-        fmt.Println("123 envoyé !")
+        fmt.Println("Entier envoyé !")
     default:
         fmt.Println("Envoi impossible !")
     }
@@ -808,15 +808,183 @@ func main() {
 
 ---
 
-```go
+```go []
 func main() {
     var ch = make(chan int)
 
     select {
     case ch <- 123:
-        fmt.Println("123 envoyé !")
-    case <-time.After(10*time.Second):
+        fmt.Println("Entier envoyé !")
+    case <-time.After(10 * time.Second):
         fmt.Println("Timeout !")
     }
 }
 ```
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    const [i] = yield select(
+        send(ch1, 123),
+        send(ch2, 'foo'),
+    )
+
+    switch (i) {
+    case 0:
+        console.log('Entier envoyé !')
+        break
+    case 1:
+        console.log('Chaîne envoyée !')
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.4em;" -->
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    const [i, value] = yield select(
+        recv(ch1),
+        recv(ch2),
+    )
+
+    switch (i) {
+    case 0:
+        console.log(`Entier ${value} reçu`)
+        break
+    case 1:
+        console.log(`Chaîne "${value}" reçue`)
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.4em;" -->
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    const [i] = yield select(
+        send(ch1, 123),
+        select.default,
+    )
+
+    switch (i) {
+    case 0:
+        console.log('Entier envoyé !')
+        break
+    default:
+        console.log('Envoi impossible !')
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.4em;" -->
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    yield select(
+        [recv(ch1), (value) => {
+            console.log(`Entier ${value} reçu`)
+        }],
+        [recv(ch2), (value) => {
+            console.log(`Chaîne "${value}" reçue`)
+        }],
+    )
+}
+```
+<!-- .element: style="font-size: 0.52em;" -->
+
+---
+
+```js []
+let solde = 100
+
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
+
+    yield select(
+        [recv(ch1), function*(value) {
+            yield send(ch2, `${value}`)
+        }],
+        [recv(ch2), (value) => {
+            console.log(`Chaîne "${value}" reçue`)
+        }],
+    )
+}
+```
+<!-- .element: style="font-size: 0.52em;" -->
+
+---
+
+[![No demo !](asleep_2.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere/channels/src/index.ts:48)
+
+---
+
+## Une ou des opérations sont-elles prêtes ?
+
+---
+
+## Une opération est prête
+## 👇
+## Elle est déclenchée
+
+---
+
+## Plusieurs opération sont prêtes
+## 👇
+## Une opération au hasard est déclenchée
+
+---
+
+## Aucune opération n'est prête
+## 👇
+## Est-ce qu'il y a un default ?
+
+---
+
+## Il y a un default
+## 👇
+## Il est déclenché
+
+---
+
+## Il n'y a pas de default
+## 👇
+## On attend que l'une des opérations soit prête
+
+----
+
+<!-- .slide: style="padding-left: 200px; text-align: left;" -->
+
+### ☑ Envoi et réception
+### ☑ Channel avec buffer
+### ☑ Fermeture de channel
+### ☑ Itération sur channel
+### ☑ Select
