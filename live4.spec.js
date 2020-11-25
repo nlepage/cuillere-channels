@@ -10,7 +10,7 @@ describe('Live 1', () => {
 
             yield fork(deposer(depots, [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]))
 
-            for await (const depot of yield range(depots)) {
+            for await (const depot of range(depots)) {
                 solde = solde + depot
                 console.log(`Dépôt de ${depot} reçu`)
             }

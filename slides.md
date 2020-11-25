@@ -154,9 +154,9 @@ func deposer(depots chan int, montant int) {
 ```js []
 function fetchUrl(url) {
     fetch(url).then((response) => {
-        response.text().then((source) => {
-            console.log(source)
-        })
+        return response.text()
+    }).then((source) => {
+        console.log(source)
     })
 }
 
@@ -230,7 +230,7 @@ parseUrl('https://mdn.io/async/await')
 ---
 
 ```js []
-async function parseSource(source) {
+function parseSource(source) {
     // ...
     const config = loadParserConfig()
     // ...
@@ -258,7 +258,7 @@ async function parseSource(source) {
 async function parseUrl(url) {
     const response = await fetch('https://mdn.io/Promise')
     const source = await response.text()
-    parseSource(source)
+    await parseSource(source)
 }
 
 parseUrl('https://mdn.io/Promise')
@@ -397,7 +397,7 @@ function* getName() {
     return 'world'
 }
 
-cuillere().start(example())
+cuillere().start(helloWorld())
 ```
 
 ---
@@ -824,34 +824,6 @@ func main() {
 ---
 
 ```js []
-let solde = 100
-
-function* main() {
-    const ch1 = chan()
-    const ch2 = chan()
-
-    const [i] = yield select(
-        send(ch1, 123),
-        send(ch2, 'foo'),
-    )
-
-    switch (i) {
-    case 0:
-        console.log('Entier envoyé !')
-        break
-    case 1:
-        console.log('Chaîne envoyée !')
-        break
-    }
-}
-```
-<!-- .element: style="font-size: 0.4em;" -->
-
----
-
-```js []
-let solde = 100
-
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -871,13 +843,35 @@ function* main() {
     }
 }
 ```
-<!-- .element: style="font-size: 0.4em;" -->
+<!-- .element: style="font-size: 0.42em;" -->
 
 ---
 
 ```js []
-let solde = 100
+function* main() {
+    const ch1 = chan()
+    const ch2 = chan()
 
+    const [i] = yield select(
+        send(ch1, 123),
+        send(ch2, 'foo'),
+    )
+
+    switch (i) {
+    case 0:
+        console.log('Entier envoyé !')
+        break
+    case 1:
+        console.log('Chaîne envoyée !')
+        break
+    }
+}
+```
+<!-- .element: style="font-size: 0.42em;" -->
+
+---
+
+```js []
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -897,13 +891,11 @@ function* main() {
     }
 }
 ```
-<!-- .element: style="font-size: 0.4em;" -->
+<!-- .element: style="font-size: 0.42em;" -->
 
 ---
 
 ```js []
-let solde = 100
-
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -918,13 +910,11 @@ function* main() {
     )
 }
 ```
-<!-- .element: style="font-size: 0.52em;" -->
+<!-- .element: style="font-size: 0.54em;" -->
 
 ---
 
 ```js []
-let solde = 100
-
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -988,3 +978,19 @@ function* main() {
 ### ☑ Fermeture de channel
 ### ☑ Itération sur channel
 ### ☑ Select
+
+---
+
+## Exemple d'utilisation
+
+---
+
+[![Logo envelope](envelope_logo.gif)](https://github.com/tgirier/envelope) <!-- .element: target="_blank" -->
+
+---
+
+## [@cuillere/envelope 🥄📨](vscode://file/home/nico/git/envelope/src/index.ts) <!-- .element: target="_blank" -->
+
+----
+
+![Merci !](heart_gopher.png) <!-- .element: style="width: 200px;" -->
