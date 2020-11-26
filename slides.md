@@ -651,7 +651,7 @@ function* deposer(depots, montant) {
 Notes:
 - Modif chan: capacity=0, buffer, bufferLength
 - handler send:
-  - On sait que si recvQ pas vide alors buffer vide (sinon recver aurait pris dans buffer)
+  - Si recvers dans recvQ, n'ont rien trouvé dans buffer, donc déjà OK
   - recvQ vide -> buffer plein ?
 - handler recv:
   - D'abord buffer pr respecter FIFO

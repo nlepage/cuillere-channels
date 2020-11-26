@@ -1,8 +1,8 @@
 const { cuillere, fork } = require('@cuillere/core')
 const { channelsPlugin, chan, send, recv, close } = require('./live')
 
-describe('Live 1', () => {
-    it('On doit pouvoir créer un channel, et envoyer et recevoir dessus', async () => {
+describe('Live 3', () => {
+    it('On doit pouvoir fermer un channel, et savoir si il est fermé', async () => {
         let solde = 100
 
         function* main() {
@@ -32,5 +32,28 @@ describe('Live 1', () => {
         await cllr.start(main())
 
         expect(solde).toBe(5600)
+    })
+
+    it('On ne doit pas pouvoir envoyer sur un channel fermé', async () => {
+        function* test() {
+            const ch = chan()
+            close(ch)
+            yield send(ch, 123)
+        }
+
+        const cllr = cuillere(channelsPlugin())
+
+        await expect(cllr.start(test())).rejects.toEqual(new Error('send on closed channel'))
+    })
+
+
+    it("On ne doit pouvoir fermer un channel Qu'une seule fois", async () => {
+        function test() {
+            const ch = chan()
+            close(ch)
+            close(ch)
+        }
+
+        expect(test).toThrow(new Error('channel already closed'))
     })
 })

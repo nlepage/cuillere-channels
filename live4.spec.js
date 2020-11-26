@@ -1,8 +1,8 @@
 const { cuillere, fork } = require('@cuillere/core')
 const { channelsPlugin, chan, send, close, range } = require('./live')
 
-describe('Live 1', () => {
-    it('On doit pouvoir créer un channel, et envoyer et recevoir dessus', async () => {
+describe('Live 4', () => {
+    it('On doit pouvoir itérer sur un channel', async () => {
         let solde = 100
 
         async function* main() {
