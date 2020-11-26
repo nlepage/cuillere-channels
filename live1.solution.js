@@ -19,7 +19,7 @@ function channelsPlugin() {
                 })
             },
 
-            async* recv({ key, value }) {
+            async* recv({ key }) {
                 const ch = chans.get(key)
 
                 const sender = ch.sendQ.shift()
@@ -36,9 +36,7 @@ function channelsPlugin() {
 const chans = new WeakMap()
 
 function chan() {
-    const key = {
-        get [Symbol.toStringTag]() { return 'chan' }
-    }
+    const key = {}
     chans.set(key, {
         sendQ: [],
         recvQ: [],

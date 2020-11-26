@@ -30,22 +30,6 @@ function channelsPlugin() {
             async* recv({ key, detail }) {
                 return doRecv(chans.get(key), detail)
             },
-
-            async* range({ key }) {
-                const ch = chans.get(key)
-
-                return {
-                    [Symbol.asyncIterator]() { return this },
-
-                    async next() {
-                        const [value, ok] = await doRecv(ch, true)
-                        return {
-                            value,
-                            done: !ok,
-                        }
-                    },
-                }
-            },
         }
     }
 }
@@ -104,6 +88,22 @@ async function doRecv(ch, detail) {
     })
 }
 
+function range({ key }) {
+    const ch = chans.get(key)
+
+    return {
+        [Symbol.asyncIterator]() { return this },
+
+        async next() {
+            const [value, ok] = await doRecv(ch, true)
+            return {
+                value,
+                done: !ok,
+            }
+        },
+    }
+}
+
 function close(key) {
     const ch = chans.get(key)
 
@@ -113,13 +113,6 @@ function close(key) {
 
     let recver
     while (recver = ch.recvQ.shift()) recver([undefined, false])
-}
-
-function range(key) {
-    return {
-        kind: '@channels/range',
-        key,
-    }
 }
 
 module.exports = {

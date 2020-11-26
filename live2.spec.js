@@ -9,7 +9,9 @@ describe('Live 2', () => {
             const depots = chan(5)
          
             let montants = [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]
-            for (const montant of montants) yield fork(deposer(depots, montant))
+            for (const montant of montants) {
+                yield fork(deposer(depots, montant))
+            }
          
             for (let i = 0; i < montants.length; i++) {
                 const depot = yield recv(depots)

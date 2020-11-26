@@ -14,7 +14,12 @@ css: styles.css
 ![Go channels in JS](title.jpg)
 
 Notes:
-olaaa
+
+- Bjr & bienvenue BordeauxJS
+- Merci à vs connectés...
+- Merci à Jérôme
+- SWITCH SCENE
+- Comment implem channels Go en JS
 
 ---
 
@@ -22,18 +27,24 @@ olaaa
 
 ## Nicolas Lepage
 
-Développeur chez Zenika Nantes
+Consultant chez Zenika Nantes
 
 [![Twitter logo](twitter.png) <!-- .element: style="margin: 0; vertical-align: middle; width: 60px;" --> @njblepage](https://twitter.com/njblepage)
 
 [![Github logo](github.png) <!-- .element: style="margin: 0 15px 0 0; vertical-align: middle; width: 35px;" --> github.com/nlepage](https://github.com/nlepage)
+
+Notes:
+
+- Consultant Zenika Nantes (merci)
+- Principalement dev JS
 
 ---
 
 ## Asynchronisme
 
 Notes:
-- Concurrence en Go et channels
+
+- Prog Concurrente en Go et channels
 - Asynchronisme en JS, promesses, async/await, event-loop
 - Comprendre différences
 
@@ -42,23 +53,36 @@ Notes:
 ## Des channels Go en JS
 
 Notes:
-Différentes manières d'implémenter
-Implémenter fonctionnalités de base et avancées
+
+- Imaginer différentes manières
+- Fonctionnalités de base et avancées
 
 ---
 
 ## Exemple d'utilisation
 
+Notes:
+
+- Un petit exemple d'utilisation
+- Peut-être démo si le temps
+
 ---
 
-## Disclaimer
+## ⚠️ Disclaimer ⚠️
 
 Notes:
-blabla
+
+- Pas présenter super framework à utiliser demain sur votre projet
+- Expérience a pour but fun et apprendre
 
 ----
 
 ## Concurrence en Go
+
+Notes:
+
+- Comment fait-on en Go ?
+- But: gérer plusieurs tâches simultanément
 
 ---
 
@@ -75,9 +99,36 @@ func func1() {
 }
 ```
 
+Notes:
+
+- main: principal...
+- 2ème fonction func1
+- prefixe go -> goroutine
+- goroutine: processus légers, pas des threads (pas gérés par OS) mais par runtime Go
+- main et func1 exécutent en même temps
+- subtilité derrière en même temps...
+
 ---
 
-```go []
+![Diagramme Concurrence en Go 1](diagram-go-concurrency-1.png)
+
+Notes:
+
+- Selon les ressources systèmes, processeurs...
+- Possible que jamais en parallèle
+- ou bien...
+
+---
+
+![Diagramme Concurrence en Go 2](diagram-go-concurrency-2.png)
+
+Notes:
+
+- Vraiment en parallèle, runtime Go créé plusieurs threads
+
+---
+
+```go [|8|10-17|11-12|19-21|14|16||19-21]
 package main
 
 import (
@@ -91,7 +142,7 @@ func main() {
     go deposer(100)
     go deposer(200)
 
-    time.Sleep(100*time.Millisecond)
+    time.Sleep(100 * time.Millisecond)
 
     fmt.Println("Nouveau solde de", solde)
 }
@@ -102,17 +153,29 @@ func deposer(montant int) {
 ```
 <!-- .element: style="font-size: 0.38em;" -->
 
+Notes:
+
+- solde
+- main
+- go deposer
+- deposer
+- sleep
+- print
+- Sure ou pas ? risque de problème ?
+- oui dans deposer, data race
+- comment gérer ? mutex, verrous...
+
 ---
 
-![Diagramme Concurrence en Go 1](diagram-go-concurrency-1.png)
+## Channels
+
+Notes:
+
+- Tuyaux pour échanger valeurs entre goroutines
 
 ---
 
-![Diagramme Concurrence en Go 2](diagram-go-concurrency-2.png)
-
----
-
-```go []
+```go [|4|6-7|17-19|9-12|]
 var solde = 100
 
 func main() {
@@ -135,7 +198,12 @@ func deposer(depots chan int, montant int) {
 ```
 <!-- .element: style="font-size: 0.33em;" -->
 
-[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/3ixH9HCi7lH) <!-- .element: target="_blank" -->
+Notes:
+
+- Explication exemple...
+- IMPORTANT: Envoi/réception: opérations bloquantes
+- FIFO
+- Avantage: Plus de sleep dans main
 
 ---
 
@@ -144,6 +212,10 @@ func deposer(depots chan int, montant int) {
 ## =
 
 ## Pas de mémoire partagée
+
+Notes:
+
+- Principe de base des channels
 
 ----
 
@@ -219,8 +291,8 @@ function parseSource(source) {
 
 function parseUrl(url) {
     fetch(url).then((response) => {
-        response.text().then(parseSource)
-    })
+        return response.text()
+    }).then(parseSource)
 }
 
 parseUrl('https://mdn.io/Promise')
@@ -304,6 +376,8 @@ async function deposer(montant) {
 
 Notes:
 - Quelle API ?
+- Bien entendu: pas les syntaxes de Go...
+- Des channels Go: Coller le plus possible ! (existe autres langages ou en JS)
 
 ---
 
@@ -318,6 +392,11 @@ async function example() {
 }
 ```
 
+Notes:
+
+- Méthodes sur channels bof
+- Pas de véritable encapsulation (private tjrs proposition)
+
 ---
 
 ### async/await et plain objects
@@ -331,9 +410,13 @@ async function example() {
 }
 ```
 
----
+Notes:
 
-<!-- .slide: data-transition="convex-in none" -->
+- Fonctions mieux
+- État du channel ouvert à tous les vents...
+- channels en go = refs
+
+---
 
 ### async/await et références
 
@@ -346,26 +429,35 @@ async function example() {
 }
 ```
 
----
+Notes:
 
-<!-- .slide: data-transition="none convex-out" -->
+- Channels refs -> OK
+- Dernier problème
+
+---
 
 ### async/await et références
 
-```js []
+```js [4]
 async function example() {
     const ch = chan()
 
-    const p = recv(ch)
+    const v = recv(ch)
     await send(ch, 123)
 }
 ```
+
+Notes:
+
+- Send/receive pas vraiment bloquants
+- Comment faire ?
+- Fonctions génératrices...
 
 ---
 
 ### Fonctions génératrices et références
 
-```js []
+```js [|4]
 function* example() {
     const ch = chan()
 
@@ -373,6 +465,15 @@ function* example() {
     yield send(ch, 123)
 }
 ```
+
+Notes:
+
+- Pas vraiment des fonctions
+- Renvoie un générateur
+- Générateurs: Object permet contrôler déroulement fonction génératrice
+- Contrôler grâce au yield
+- Pb: pas le faire à la main
+- Vs allez rire ça tombe bien !
 
 ---
 
@@ -382,9 +483,14 @@ Framework d'exécution de fonction génératrice.
 
 Un ami 👉 [![Valou](valou.png) <!-- .element: style="maring: 0; vertical-align: middle; width: 400px;" -->](https://github.com/EmrysMyrddin)
 
+Notes:
+
+- Valentin Cocaud
+- Cuillere: framework extensible, possible ajouter nouveaux comportement via plugin
+
 ---
 
-```js []
+```js [|13|3-7|4|9-11|]
 const cuillere = require('@cuillere/core')
 
 function* helloWorld() {
@@ -399,6 +505,10 @@ function* getName() {
 
 cuillere().start(helloWorld())
 ```
+
+Notes:
+
+- yield un peu comme await, avec plus de souplesse
 
 ---
 
@@ -439,6 +549,19 @@ cllr.start(main())
 
 [![Live coding n°1](slide_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live1.spec.js)
 
+Notes:
+- chan()
+- état FIFO
+- WeakMap...
+- recv factory (operation)
+- plugin
+- recv handler:
+  - shift sender
+  - promise
+- send handler:
+  - shift recver
+  - Promise
+
 ----
 
 ## C'est tout ?
@@ -457,13 +580,17 @@ cllr.start(main())
 
 ## Channel avec buffer
 
+Notes:
+
+- Rend send/recv non bloquants
+- Capacité définie
+- send bloquant si buffer plein
+- recv bloquant si buffer vide
+- fluidifie l'exécution
+
 ---
 
-## TODO schéma
-
----
-
-```go []
+```go [|4|6|7-9|19-21|11-14|]
 var solde = 100
 
 func main() {
@@ -488,18 +615,18 @@ func deposer(depots chan int, montant int) {
 ```
 <!-- .element: style="font-size: 0.38em;" -->
 
-[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/qx6X_cXAiBq) <!-- .element: target="_blank" -->
-
 ---
 
-```js []
+```js [|4|6|7-9|11-15|]
 let solde = 100
  
 function* main() {
     const depots = chan(5)
  
-    let montants = [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]
-    for (const montant of montants) yield fork(deposer(depots, montant))
+    const montants = [100, 200, 500, 1000, 600, 400, 300, 700, 900, 800]
+    for (const montant of montants) {
+        yield fork(deposer(depots, montant))
+    }
     
     for (let i = 0; i < montants.length; i++) {
         const depot = yield recv(depots)
@@ -515,11 +642,23 @@ function* deposer(depots, montant) {
     console.log(`Dépôt de ${montant} terminé`)
 }
 ```
-<!-- .element: style="font-size: 0.38em;" -->
+<!-- .element: style="font-size: 0.34em;" -->
 
 ---
 
 [![Live coding n°2](chasing_gophers.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live2.spec.js)
+
+Notes:
+- Modif chan: capacity=0, buffer, bufferLength
+- handler send:
+  - On sait que si recvQ pas vide alors buffer vide (sinon recver aurait pris dans buffer)
+  - recvQ vide -> buffer plein ?
+- handler recv:
+  - D'abord buffer pr respecter FIFO
+  - copyWithin(0, 1) + bufferLength-- + return value
+  - Place libérée dans le buffer
+  - shift sender etc.
+  - refacto
 
 ----
 
@@ -535,9 +674,15 @@ function* deposer(depots, montant) {
 
 ## Fermeture de channel
 
+Notes:
+
+- Normalement côté sender
+- Prévenir receivers que plus rien à recevoir
+- Opération définitive (pas de réouverture)
+
 ---
 
-```go []
+```go [|6|19-24|23|8-14|9|10-12|]
 var solde = 100
 
 func main() {
@@ -564,8 +709,6 @@ func deposer(depots chan int, montants []int) {
 }
 ```
 <!-- .element: style="font-size: 0.33em;" -->
-
-[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/ksLbut42NCb) <!-- .element: target="_blank" -->
 
 ---
 
@@ -660,8 +803,6 @@ func deposer(depots chan int, montants []int) {
 }
 ```
 <!-- .element: style="font-size: 0.4em;" -->
-
-[![Lien playground](hang_glider_gopher_purple.png) <!-- .element: style="margin: 0; width: 100px;" -->](https://play.golang.org/p/xBXZ2b_vwMA) <!-- .element: target="_blank" -->
 
 ---
 
@@ -947,7 +1088,7 @@ function* main() {
 
 ---
 
-## Plusieurs opération sont prêtes
+## Plusieurs opérations sont prêtes
 ## 👇
 ## Une opération au hasard est déclenchée
 

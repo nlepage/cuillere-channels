@@ -53,9 +53,7 @@ function channelsPlugin() {
 const chans = new WeakMap()
 
 function chan(capacity = 0) {
-    const key = {
-        get [Symbol.toStringTag]() { return 'chan' }
-    }
+    const key = {}
     chans.set(key, {
         sendQ: [],
         recvQ: [],
