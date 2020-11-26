@@ -18,6 +18,7 @@ Notes:
 - Bjr & bienvenue BordeauxJS
 - Merci à vs connectés...
 - Merci à Jérôme
+- Merci Marina et Valentin
 - SWITCH SCENE
 - Comment implem channels Go en JS
 
@@ -36,7 +37,6 @@ Consultant chez Zenika Nantes
 Notes:
 
 - Consultant Zenika Nantes (merci)
-- Principalement dev JS
 
 ---
 
@@ -45,7 +45,7 @@ Notes:
 Notes:
 
 - Prog Concurrente en Go et channels
-- Asynchronisme en JS, promesses, async/await, event-loop
+- Asynchronisme en JS
 - Comprendre différences
 
 ---
@@ -223,33 +223,7 @@ Notes:
 
 ---
 
-```js []
-function fetchUrl(url) {
-    fetch(url).then((response) => {
-        return response.text()
-    }).then((source) => {
-        console.log(source)
-    })
-}
-
-fetchUrl('https://mdn.io/Promise')
-```
-
----
-
-```js []
-async function fetchUrl(url) {
-    const response = await fetch(url)
-    const source = await response.text()
-    console.log(source)
-}
-
-fetchUrl('https://mdn.io/async/await')
-```
-
----
-
-```js []
+```js [|12-14|4-5|]
 let solde = 100
 
 async function main() {
@@ -266,9 +240,16 @@ async function deposer(montant) {
 }
 ```
 
+Notes:
+- Promesses, async/await ou .then
+- Exemple safe ?
+
 ---
 
 ## Un seul Thread
+
+Notes:
+- Aucune chance 2 fonctions en parallèle
 
 ---
 
@@ -276,66 +257,39 @@ async function deposer(montant) {
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cgMADL39EGs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+Notes:
+
+- Mécanisme utilisé par moteur JS pour ordonnancer l'exécution fonctions callback
+
 ---
 
 ## "Run-to-completion"
 
----
-
-```js []
-function parseSource(source) {
-    // ...
-    const config = loadParserConfig()
-    // ...
-}
-
-function parseUrl(url) {
-    fetch(url).then((response) => {
-        return response.text()
-    }).then(parseSource)
-}
-
-parseUrl('https://mdn.io/Promise')
-parseUrl('https://mdn.io/async/await')
-```
+Notes:
+- Callback du then exécuté en entier
 
 ---
 
-```js []
-function parseSource(source) {
-    // ...
-    const config = loadParserConfig()
-    // ...
+```js [|12-14|3-10|]
+let solde = 100
+
+async function main() {
+    deposer(100)
+    deposer(200)
+
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    console.log(solde)
 }
 
-async function parseUrl(url) {
-    const response = await fetch('https://mdn.io/Promise')
-    const source = await response.text()
-    parseSource(source)
+async function deposer(montant) {
+    solde = solde + montant
 }
-
-parseUrl('https://mdn.io/Promise')
-parseUrl('https://mdn.io/async/await')
 ```
 
----
-
-```js []
-async function parseSource(source) {
-    // ...
-    const config = await loadParserConfig()
-    // ...
-}
-
-async function parseUrl(url) {
-    const response = await fetch('https://mdn.io/Promise')
-    const source = await response.text()
-    await parseSource(source)
-}
-
-parseUrl('https://mdn.io/Promise')
-parseUrl('https://mdn.io/async/await')
-```
+Notes:
+- deposer: run-to-completion
+- main: pas de run-to-completion
 
 ---
 
@@ -345,24 +299,10 @@ parseUrl('https://mdn.io/async/await')
 
 ## Partage de mémoire sûr
 
----
+Notes:
 
-```js []
-let solde = 100
-
-async function main() {
-    deposer(100)
-    deposer(200)
-
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    console.log(solde)
-}
-
-async function deposer(montant) {
-    solde = solde + montant
-}
-```
+- A moins de faire exprès, pas de datarace
+- Si on résume
 
 ----
 
@@ -370,7 +310,7 @@ async function deposer(montant) {
 
 ## Inutiles donc indispensables !
 
-----
+---
 
 ## Comment ?
 
@@ -438,7 +378,7 @@ Notes:
 
 ### async/await et références
 
-```js [4]
+```js [|4]
 async function example() {
     const ch = chan()
 
@@ -512,7 +452,7 @@ Notes:
 
 ---
 
-```js []
+```js [|4|10|19|6-7|]
 let solde = 100
  
 function* main() {
@@ -537,19 +477,34 @@ function* deposer(depots, montant) {
 ```
 <!-- .element: style="font-size: 0.38em;" -->
 
+Notes:
+
+- Explication exemple
+- fork:
+  - fourni par cuillere
+  - permet démarrer génératrice dans nouvelle promesse
+  - comme appeler fonction async sans await
+- et enfin démarrage de notre exemple avec cuillere
+
 ---
 
-```js []
+```js [|1|3]
 const cllr = cuillere(channelsPlugin())
 
 cllr.start(main())
 ```
+
+Notes:
+
+- channelsPlugin pour gérer yield send/recv
 
 ---
 
 [![Live coding n°1](slide_gopher_blue.png) <!-- .element: style="width: 400px;" -->](vscode://file/home/nico/git/cuillere-channels/live1.spec.js)
 
 Notes:
+
+- On a définit notre objectif, on se lance !
 - chan()
 - état FIFO
 - WeakMap...
@@ -712,7 +667,7 @@ func deposer(depots chan int, montants []int) {
 
 ---
 
-```js []
+```js [|6|18-23|22|8-13|9|10|]
 let solde = 100
 
 function* main() {
@@ -780,7 +735,7 @@ Notes:
 
 ---
 
-```go []
+```go [|8-10]
 var solde = 100
 
 func main() {
@@ -804,9 +759,15 @@ func deposer(depots chan int, montants []int) {
 ```
 <!-- .element: style="font-size: 0.4em;" -->
 
+Notes:
+
+- Pas vraiment feature, plutôt syntaxe
+- itère jusqu'à ce que channel fermé et plus de valeur
+- Pas vraiment de syntaxe équivalente en JS
+
 ---
 
-```js []
+```js [|8-11]
 let solde = 100
 
 function* main() {
@@ -830,6 +791,9 @@ function* deposer(depots, montants) {
 }
 ```
 <!-- .element: style="font-size: 0.36em;" -->
+
+Notes:
+- Encore moins lisible que le while true...
 
 ---
 
@@ -857,7 +821,7 @@ for await (const valeur of iterableAsynchrone) {
 
 ---
 
-```js []
+```js [|8-11]
 let solde = 100
 
 function* main() {
@@ -902,7 +866,7 @@ function* deposer(depots, montants) {
 
 ---
 
-```go []
+```go [|6-7|8-9]
 func main() {
     var ch1 = make(chan int)
     var ch2 = make(chan string)
@@ -918,7 +882,7 @@ func main() {
 
 ---
 
-```go []
+```go [|6-7|8-9]
 func main() {
     var ch1 = make(chan int)
     var ch2 = make(chan string)
@@ -934,7 +898,7 @@ func main() {
 
 ---
 
-```go []
+```go [|5-6|7-8]
 func main() {
     var ch = make(chan int)
 
@@ -949,7 +913,7 @@ func main() {
 
 ---
 
-```go []
+```go [|5-6|7-8]
 func main() {
     var ch = make(chan int)
 
@@ -962,9 +926,14 @@ func main() {
 }
 ```
 
+Notes:
+
+- Comme le range pas de syntaxe en JS
+- Comment faire ?
+
 ---
 
-```js []
+```js [|5-8|10-17]
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -988,7 +957,7 @@ function* main() {
 
 ---
 
-```js []
+```js [|5-8]
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -1012,7 +981,7 @@ function* main() {
 
 ---
 
-```js []
+```js [|7]
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -1034,9 +1003,13 @@ function* main() {
 ```
 <!-- .element: style="font-size: 0.42em;" -->
 
+Notes:
+- Vraiment pas très pratique
+- Découpé en 2, yield select, puis switch
+
 ---
 
-```js []
+```js [|6-8]
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -1053,9 +1026,13 @@ function* main() {
 ```
 <!-- .element: style="font-size: 0.54em;" -->
 
+Notes:
+
+- Et même callback génératrice
+
 ---
 
-```js []
+```js [|6-8]
 function* main() {
     const ch1 = chan()
     const ch2 = chan()
@@ -1130,8 +1107,25 @@ function* main() {
 
 ---
 
-## [@cuillere/envelope 🥄📨](vscode://file/home/nico/git/envelope/src/index.ts) <!-- .element: target="_blank" -->
+## [@cuillere/envelope 🥄📨](vscode://file/home/nico/git/envelope/src/envelope.ts:10) <!-- .element: target="_blank" -->
+
+Notes:
+
+- Écrit en TS !
+- 3 channels...
+- run...
+- listen...
+- handle...
 
 ----
 
 ![Merci !](heart_gopher.png) <!-- .element: style="width: 200px;" -->
+
+### [nlepage.github.io/cuillere-channels](https://nlepage.github.io/cuillere-channels/#/)
+### [dev.to/nlepage](https://dev.to/nlepage)
+
+---
+
+![?](question_mark.png) <!-- .element: style="margin-bottom: 0; width: 60px;" -->
+
+![gopher](facing_gopher.png) <!-- .element: style="margin-top: 0; width: 200px;" -->
